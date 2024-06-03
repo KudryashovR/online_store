@@ -2,9 +2,23 @@ from django.shortcuts import render
 
 import datetime
 
+from catalog.models import Product
+
 
 def home(request):
-    return render(request, 'catalog/home.html')
+    latest_products = Product.objects.order_by('-id')[:5]
+
+    for product in latest_products:
+        print(
+            f'Product ID: {product.id}, Name: {product.name}, Description: {product.description}, '
+            f'Price: {product.price}'
+        )
+
+    context = {
+        'products': latest_products,
+    }
+
+    return render(request, 'catalog/home.html', context)
 
 
 def contacts(request):
