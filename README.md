@@ -35,7 +35,20 @@ poetry install
 poetry shell
 ```
 
-2. Проведите миграции:
+2. Создайте базу данных `catalog` и, при необходимости, отредактируйте параметры подключения к БД в файле `settings.py`:
+
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'catalog',
+        'USER': 'postgres',
+        'PASSWORD': '11235813',
+    }
+}
+```
+
+3. Проведите миграции:
 
 ```bash
 python manage.py migrate
