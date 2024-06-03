@@ -2,7 +2,7 @@ from django.shortcuts import render
 
 import datetime
 
-from catalog.models import Product
+from catalog.models import Product, Contact
 
 
 def home(request):
@@ -30,4 +30,9 @@ def contacts(request):
         with open('messages.txt', 'a+', encoding='utf-8') as file:
             file.write(f"{datetime.datetime.now()} - {name} ({phone}): {message}\n")
 
-    return render(request, 'catalog/contacts.html')
+    contact_details = Contact.objects.all()
+    context = {
+        'contact_details': contact_details,
+    }
+
+    return render(request, 'catalog/contacts.html', context)
