@@ -6,14 +6,7 @@ from catalog.models import Product, Contact
 
 
 def home(request):
-    latest_products = Product.objects.order_by('-id')[:5]
-
-    for product in latest_products:
-        print(
-            f'Product ID: {product.id}, Name: {product.name}, Description: {product.description}, '
-            f'Price: {product.price}'
-        )
-
+    latest_products = Product.objects.order_by('-id')[:100]
     context = {
         'products': latest_products,
     }

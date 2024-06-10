@@ -31,7 +31,9 @@
                     <h4 class="my-0 font-weight-normal">{{ product.name }}</h4>
                 </div>
                 <div class="card-body">
+                    {% if product.preview %}
                     <img src="/media/{{ product.preview }}" class="img-fluid" alt="{{ product.name }}">
+                    {% endif %}
                     <h1 class="card-title pricing-card-title">{{ product.price }} руб.</h1>
                     <ul class="list-unstyled mt-3 mb-4 text-start m-3">
                         <li>- {{ product.description }}</li>
