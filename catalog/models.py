@@ -1,3 +1,4 @@
+from django import forms
 from django.db import models
 
 NULLABLE = {'blank': True, 'null': True}
@@ -46,3 +47,11 @@ class Contact(models.Model):
     class Meta:
         verbose_name = 'Контакт'
         verbose_name_plural = 'Контакты'
+
+
+class ProductForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        fields = [
+            'name', 'description', 'preview', 'category', 'price'
+        ]
