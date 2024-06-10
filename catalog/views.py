@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 
 import datetime
 
@@ -36,3 +36,12 @@ def contacts(request):
     }
 
     return render(request, 'catalog/contacts.html', context)
+
+
+def product_detail(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    context = {
+        'product': product
+    }
+
+    return render(request, 'catalog/product_detail.html', context)
