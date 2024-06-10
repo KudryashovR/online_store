@@ -1,21 +1,19 @@
-from django.shortcuts import render
+from django.core.paginator import Paginator
+from django.http import HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404
 
 import datetime
 
-from catalog.models import Product, Contact
+from catalog.models import Product, Contact, Category, ProductForm
 
 
 def home(request):
-    latest_products = Product.objects.order_by('-id')[:5]
-
-    for product in latest_products:
-        print(
-            f'Product ID: {product.id}, Name: {product.name}, Description: {product.description}, '
-            f'Price: {product.price}'
-        )
-
+    products_list = Product.objects.all().order_by('id')
+    paginator = Paginator(products_list, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     context = {
-        'products': latest_products,
+        'page_obj': page_obj,
     }
 
     return render(request, 'catalog/home.html', context)
@@ -36,3 +34,28 @@ def contacts(request):
     }
 
     return render(request, 'catalog/contacts.html', context)
+
+
+def product_detail(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    context = {
+        'product': product
+    }
+
+    return render(request, 'catalog/product_detail.html', context)
+
+
+def new_product(request):
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+
+            return HttpResponseRedirect('/')
+    else:
+        categories = Category.objects.all().order_by('id')
+        context = {
+            'categories': categories
+        }
+
+        return render(request, 'catalog/new_product.html', context)
