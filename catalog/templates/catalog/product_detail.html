@@ -28,7 +28,9 @@
             <div class="card mb-6 box-shadow">
                 <div class="card-body">
                     <h1>{{ product.name }}</h1>
+                    {% if product.preview %}
                     <img src="/media/{{ product.preview }}" class="img-fluid" alt="{{ product.name }}">
+                    {% endif %}
                     <p><strong>Категория:</strong> {{ product.category }}</p>
                     <p><strong>Цена:</strong> {{ product.price }}</p>
                     <p><strong>Описание:</strong> {{ product.description }}</p>
