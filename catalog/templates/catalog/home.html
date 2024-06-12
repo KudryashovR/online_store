@@ -21,7 +21,7 @@
                 {% endif %}
                 <h1 class="card-title pricing-card-title">{{ product.price }} руб.</h1>
                 <ul class="list-unstyled mt-3 mb-4 text-start m-3">
-                    <li>- {{ product.description }}</li>
+                    <li>- {{ product.description|truncatechars:100 }}</li>
                 </ul>
                 {% url 'catalog:product_detail' product.id as my_url %}
                 <a class="p-2 btn btn-outline-primary"
