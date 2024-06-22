@@ -1,12 +1,11 @@
-from django.core.paginator import Paginator
+from datetime import datetime
+
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 
-import datetime
+from django.views.generic import ListView, TemplateView
 
-from django.views.generic import ListView
-
-from catalog.models import Product, Contact, Category, ProductForm
+from catalog.models import Product, Category, ProductForm, Contact
 
 
 class ProductListView(ListView):
@@ -14,21 +13,31 @@ class ProductListView(ListView):
     paginate_by = 10
 
 
-def contacts(request):
-    if request.method == 'POST':
-        name = request.POST.get('name')
-        phone = request.POST.get('phone')
-        message = request.POST.get('message')
+class ContactView(TemplateView):
+    model = Contact
+    template_name = 'catalog/contact_list.html'
 
-        with open('messages.txt', 'a+', encoding='utf-8') as file:
-            file.write(f"{datetime.datetime.now()} - {name} ({phone}): {message}\n")
+    def post(self, request, *args, **kwargs):
+        if request.method == 'POST':
+            name = request.POST.get('name')
+            phone = request.POST.get('phone')
+            message = request.POST.get('message')
 
-    contact_details = Contact.objects.all()
-    context = {
-        'contact_details': contact_details,
-    }
+            with open('messages.txt', 'a+', encoding='utf-8') as file:
+                file.write(f"{datetime.now()} - {name} ({phone}): {message}\n")
 
-    return render(request, 'catalog/contacts.html', context)
+        contact_details = Contact.objects.all()
+        context = {
+            'object_list': contact_details,
+        }
+
+        return self.render_to_response(context)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['object_list'] = Contact.objects.all()
+
+        return context
 
 
 def product_detail(request, product_id):
