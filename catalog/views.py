@@ -70,13 +70,22 @@ class BlogDetailView(DetailView):
     slug_field = 'slug'
     slug_url_kwarg = 'slug'
 
+    def get_object(self, *args, **kwargs):
+        article = super().get_object(*args, **kwargs)
+        article.views_count += 1
+        article.save()
+
+        return article
+
 
 class BlogUpdateView(UpdateView):
     model = Blog
     fields = ('title', 'content', 'preview', 'is_published')
-    success_url = reverse_lazy('catalog:blog')
     slug_field = 'slug'
     slug_url_kwarg = 'slug'
+
+    def get_success_url(self):
+        return reverse_lazy('catalog:blog_detail', kwargs={'slug': self.object.slug})
 
 
 class BlogDeleteView(DeleteView):
