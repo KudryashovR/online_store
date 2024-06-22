@@ -1,0 +1,28 @@
+{% extends 'catalog/base.html' %}
+{% block content %}
+{% load custom_filters %}
+<div class="row text-start">
+    <div class="col-3"></div>
+    <div class="col-lg-6 col-md-6 col-sm-6">
+        <div class="card mb-6 box-shadow">
+            <div class="card-body">
+                <h1>{{ blog.title }}</h1>
+                {% if blog.preview %}
+                <img src="{{ blog.preview|media_redirection }}" class="img-fluid" alt="{{ blog.title }}">
+                {% endif %}
+                <p><strong>Дата создания:</strong> {{ blog.created_at }}</p>
+                <p><strong>Содержимое:</strong> {{ blog.content }}</p>
+                <p><strong>Количество просотров:</strong> {{ blog.views_count }}</p>
+                <p>
+                    {% if blog.is_published %}
+                    <strong>Статья опубликована:</strong> да
+                    {% else %}
+                    <strong>Статья опубликована:</strong> нет
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-3"></div>
+</div>
+{% endblock %}

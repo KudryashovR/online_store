@@ -63,3 +63,9 @@ class BlogCreateView(CreateView):
     model = Blog
     fields = ('title', 'content', 'preview', 'is_published')
     success_url = reverse_lazy('catalog:blog')
+
+
+class BlogDetailView(DetailView):
+    model = Blog
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'

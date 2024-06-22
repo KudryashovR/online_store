@@ -9,31 +9,14 @@
 </div>
 <div class="row text-center">
     {% for article in object_list %}
-    {% if article.is_published %}
     <div class="col-3">
+        {% if article.is_published %}
         <div class="card mb-4 box-shadow">
-            <div class="card-header">
-                <h4 class="my-0 font-weight-normal">{{ article.title }} ({{ article.slug }})</h4>
-            </div>
-            <div class="card-body">
-                {% if article.preview %}
-                <img src="{{ article.preview|media_redirection }}" class="img-fluid" alt="{{ article.title }}">
-                {% endif %}
-                <p>{{ article.created_at }}</p>
-                <ul class="list-unstyled mt-3 mb-4 text-start m-3">
-                    <li>- {{ article.content|truncatechars:100 }}</li>
-                </ul>
-                <p>Количество просмотров: {{ article.views_count }}</p>
-                <a class="p-2 btn btn-outline-primary"
-                   href="#">Подробнее</a>
-            </div>
-        </div>
-    </div>
-    {% else %}
-    <div class="col-3">
+        {% else %}
         <div class="card mb-4 bg-warning">
+        {% endif %}
             <div class="card-header">
-                <h4 class="my-0 font-weight-normal">{{ article.title }} ({{ article.slug }})</h4>
+                <h4 class="my-0 font-weight-normal">{{ article.title }}</h4>
             </div>
             <div class="card-body">
                 {% if article.preview %}
@@ -45,11 +28,10 @@
                 </ul>
                 <p>Количество просмотров: {{ article.views_count }}</p>
                 <a class="p-2 btn btn-outline-primary"
-                   href="#">Подробнее</a>
+                   href="{% url 'catalog:blog_detail' article.slug %}">Подробнее</a>
             </div>
         </div>
     </div>
-    {% endif %}
     {% endfor %}
 </div>
 <div class="row">
