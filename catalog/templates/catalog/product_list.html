@@ -1,5 +1,6 @@
 {% extends 'catalog/base.html' %}
 {% block content %}
+{% load custom_filters %}
 <div class="row">
     <div class="col-10"></div>
     <div class="col-2">
@@ -8,7 +9,7 @@
     </div>
 </div>
 <div class="row text-center">
-    {% for product in page_obj %}
+    {% for product in object_list %}
     <div class="col-3">
         <div class="card mb-4 box-shadow">
             <div class="card-header">
@@ -16,7 +17,6 @@
             </div>
             <div class="card-body">
                 {% if product.preview %}
-                {% load custom_filters %}
                 <img src="{{ product.preview|media_redirection }}" class="img-fluid" alt="{{ product.name }}">
                 {% endif %}
                 <h1 class="card-title pricing-card-title">{{ product.price }} руб.</h1>

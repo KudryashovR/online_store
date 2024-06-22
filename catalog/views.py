@@ -1,61 +1,95 @@
-from django.core.paginator import Paginator
-from django.http import HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404
+from datetime import datetime
 
-import datetime
+from django.urls import reverse_lazy
+from django.views.generic import ListView, TemplateView, DetailView, CreateView, UpdateView, DeleteView
 
-from catalog.models import Product, Contact, Category, ProductForm
-
-
-def home(request):
-    products_list = Product.objects.all().order_by('id')
-    paginator = Paginator(products_list, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    context = {
-        'page_obj': page_obj,
-    }
-
-    return render(request, 'catalog/home.html', context)
+from catalog.models import Product, Contact, Category, Blog
 
 
-def contacts(request):
-    if request.method == 'POST':
-        name = request.POST.get('name')
-        phone = request.POST.get('phone')
-        message = request.POST.get('message')
-
-        with open('messages.txt', 'a+', encoding='utf-8') as file:
-            file.write(f"{datetime.datetime.now()} - {name} ({phone}): {message}\n")
-
-    contact_details = Contact.objects.all()
-    context = {
-        'contact_details': contact_details,
-    }
-
-    return render(request, 'catalog/contacts.html', context)
+class ProductListView(ListView):
+    model = Product
+    paginate_by = 10
 
 
-def product_detail(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    context = {
-        'product': product
-    }
+class ContactView(TemplateView):
+    model = Contact
+    template_name = 'catalog/contact_list.html'
 
-    return render(request, 'catalog/product_detail.html', context)
+    def post(self, request, *args, **kwargs):
+        if request.method == 'POST':
+            name = request.POST.get('name')
+            phone = request.POST.get('phone')
+            message = request.POST.get('message')
 
+            with open('messages.txt', 'a+', encoding='utf-8') as file:
+                file.write(f"{datetime.now()} - {name} ({phone}): {message}\n")
 
-def new_product(request):
-    if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-
-            return HttpResponseRedirect('/')
-    else:
-        categories = Category.objects.all().order_by('id')
+        contact_details = Contact.objects.all()
         context = {
-            'categories': categories
+            'object_list': contact_details,
         }
 
-        return render(request, 'catalog/new_product.html', context)
+        return self.render_to_response(context)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['object_list'] = Contact.objects.all()
+
+        return context
+
+
+class ProductDetailView(DetailView):
+    model = Product
+
+
+class ProductCreateView(CreateView):
+    model = Product
+    fields = ('name', 'description', 'preview', 'category', 'price')
+    success_url = reverse_lazy('catalog:home')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categories'] = Category.objects.all().order_by('id')
+
+        return context
+
+
+class BlogListView(ListView):
+    model = Blog
+    paginate_by = 10
+
+
+class BlogCreateView(CreateView):
+    model = Blog
+    fields = ('title', 'content', 'preview', 'is_published')
+    success_url = reverse_lazy('catalog:blog')
+
+
+class BlogDetailView(DetailView):
+    model = Blog
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'
+
+    def get_object(self, *args, **kwargs):
+        article = super().get_object(*args, **kwargs)
+        article.views_count += 1
+        article.save()
+
+        return article
+
+
+class BlogUpdateView(UpdateView):
+    model = Blog
+    fields = ('title', 'content', 'preview', 'is_published')
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'
+
+    def get_success_url(self):
+        return reverse_lazy('catalog:blog_detail', kwargs={'slug': self.object.slug})
+
+
+class BlogDeleteView(DeleteView):
+    model = Blog
+    success_url = reverse_lazy('catalog:blog')
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'

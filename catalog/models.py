@@ -1,5 +1,8 @@
-from django import forms
+from django.core.mail import send_mail
 from django.db import models
+from django.utils.text import slugify
+
+from config import settings
 
 NULLABLE = {'blank': True, 'null': True}
 
@@ -49,9 +52,38 @@ class Contact(models.Model):
         verbose_name_plural = 'Контакты'
 
 
-class ProductForm(forms.ModelForm):
+class Blog(models.Model):
+    title = models.CharField(max_length=200, verbose_name="Заголовок", help_text="Введите заголовок статьи")
+    slug = models.SlugField(max_length=200)
+    content = models.TextField(verbose_name="Содержание", help_text="Введите содержание статьи")
+    preview = models.ImageField(upload_to='blog/', verbose_name="Изображение",
+                                help_text="Загрузите изображение для превью статьи")
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_published = models.BooleanField(default=True, verbose_name="Опубликовано")
+    views_count = models.PositiveIntegerField(default=0)
+    author_email = models.EmailField(verbose_name="E-mail автора", help_text="Введите E-mail автора статьи", **NULLABLE)
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+
+        super().save(*args, **kwargs)
+
+        if self.views_count == 100:
+            self.send_congratulation_email()
+
+    def send_congratulation_email(self):
+        send_mail(
+            'Поздравляем!',
+            f'Ваша статья "{self.title}" набрала 100 просмотров!',
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[self.author_email],
+            fail_silently=False,
+        )
+
     class Meta:
-        model = Product
-        fields = [
-            'name', 'description', 'preview', 'category', 'price'
-        ]
+        verbose_name = 'Статья'
+        verbose_name_plural = 'Статьи'
