@@ -58,6 +58,9 @@ class BlogListView(ListView):
     model = Blog
     paginate_by = 10
 
+    def get_queryset(self):
+        return Blog.objects.filter(is_published=True)
+
 
 class BlogCreateView(CreateView):
     model = Blog
