@@ -1,5 +1,6 @@
 from django import forms
 from django.db import models
+from django.utils.text import slugify
 
 NULLABLE = {'blank': True, 'null': True}
 
@@ -56,11 +57,17 @@ class Blog(models.Model):
     preview = models.ImageField(upload_to='blog/', verbose_name="Изображение",
                                 help_text="Загрузите изображение для превью статьи")
     created_at = models.DateTimeField(auto_now_add=True)
-    is_published = models.BooleanField(default=False)
+    is_published = models.BooleanField(default=True, verbose_name="Опубликовано")
     views_count = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Статья'

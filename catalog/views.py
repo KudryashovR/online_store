@@ -57,3 +57,9 @@ class ProductCreateView(CreateView):
 class BlogListView(ListView):
     model = Blog
     paginate_by = 10
+
+
+class BlogCreateView(CreateView):
+    model = Blog
+    fields = ('title', 'content', 'preview', 'is_published')
+    success_url = reverse_lazy('catalog:blog')

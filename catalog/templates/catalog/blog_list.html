@@ -4,7 +4,7 @@
 <div class="row">
     <div class="col-10"></div>
     <div class="col-2">
-        <a class="p-2 btn btn-outline-primary form-control mb-2" href="#">Добавить статью</a>
+        <a class="p-2 btn btn-outline-primary form-control mb-2" href="{% url 'catalog:new_blog' %}">Добавить статью</a>
     </div>
 </div>
 <div class="row text-center">
@@ -13,16 +13,17 @@
     <div class="col-3">
         <div class="card mb-4 box-shadow">
             <div class="card-header">
-                <h4 class="my-0 font-weight-normal">{{ article.title }}</h4>
+                <h4 class="my-0 font-weight-normal">{{ article.title }} ({{ article.slug }})</h4>
             </div>
             <div class="card-body">
                 {% if article.preview %}
                 <img src="{{ article.preview|media_redirection }}" class="img-fluid" alt="{{ article.title }}">
                 {% endif %}
-                <h1 class="card-title pricing-card-title">{{ article.created_at }}</h1>
+                <p>{{ article.created_at }}</p>
                 <ul class="list-unstyled mt-3 mb-4 text-start m-3">
                     <li>- {{ article.content|truncatechars:100 }}</li>
                 </ul>
+                <p>Количество просмотров: {{ article.views_count }}</p>
                 <a class="p-2 btn btn-outline-primary"
                    href="#">Подробнее</a>
             </div>
