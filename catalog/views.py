@@ -1,9 +1,9 @@
 from datetime import datetime
 
 from django.http import HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 
-from django.views.generic import ListView, TemplateView
+from django.views.generic import ListView, TemplateView, DetailView
 
 from catalog.models import Product, Category, ProductForm, Contact
 
@@ -40,13 +40,8 @@ class ContactView(TemplateView):
         return context
 
 
-def product_detail(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    context = {
-        'product': product
-    }
-
-    return render(request, 'catalog/product_detail.html', context)
+class ProductDetailView(DetailView):
+    model = Product
 
 
 def new_product(request):
