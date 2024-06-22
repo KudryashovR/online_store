@@ -1,11 +1,9 @@
 from datetime import datetime
 
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.urls import reverse_lazy
+from django.views.generic import ListView, TemplateView, DetailView, CreateView
 
-from django.views.generic import ListView, TemplateView, DetailView
-
-from catalog.models import Product, Category, ProductForm, Contact
+from catalog.models import Product, Contact, Category
 
 
 class ProductListView(ListView):
@@ -44,17 +42,13 @@ class ProductDetailView(DetailView):
     model = Product
 
 
-def new_product(request):
-    if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
+class ProductCreateView(CreateView):
+    model = Product
+    fields = ('name', 'description', 'preview', 'category', 'price')
+    success_url = reverse_lazy('catalog:home')
 
-            return HttpResponseRedirect('/')
-    else:
-        categories = Category.objects.all().order_by('id')
-        context = {
-            'categories': categories
-        }
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categories'] = Category.objects.all().order_by('id')
 
-        return render(request, 'catalog/new_product.html', context)
+        return context
