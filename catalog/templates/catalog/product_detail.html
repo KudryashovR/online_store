@@ -1,5 +1,6 @@
 {% extends 'catalog/base.html' %}
 {% block content %}
+{% load custom_filters %}
 <div class="row text-start">
     <div class="col-3"></div>
     <div class="col-lg-6 col-md-6 col-sm-6">
@@ -7,7 +8,6 @@
             <div class="card-body">
                 <h1>{{ product.name }}</h1>
                 {% if product.preview %}
-                {% load custom_filters %}
                 <img src="{{ product.preview|media_redirection }}" class="img-fluid" alt="{{ product.name }}">
                 {% endif %}
                 <p><strong>Категория:</strong> {{ product.category }}</p>
