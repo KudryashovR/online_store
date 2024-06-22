@@ -1,7 +1,7 @@
 from django.urls import path
 from catalog.apps import CatalogConfig
 from catalog.views import ProductListView, ContactView, ProductDetailView, ProductCreateView, BlogListView, \
-    BlogCreateView, BlogDetailView
+    BlogCreateView, BlogDetailView, BlogUpdateView
 
 app_name = CatalogConfig.name
 
@@ -12,5 +12,6 @@ urlpatterns = [
     path('new_product/', ProductCreateView.as_view(), name='new_product'),
     path('blog/', BlogListView.as_view(), name='blog'),
     path('blog/new/', BlogCreateView.as_view(), name='new_blog'),
-    path('blog/<slug:slug>/', BlogDetailView.as_view(), name='blog_detail')
+    path('blog/<slug:slug>/', BlogDetailView.as_view(), name='blog_detail'),
+    path('blog/<slug:slug>/edit/', BlogUpdateView.as_view(), name='blog_edit')
 ]

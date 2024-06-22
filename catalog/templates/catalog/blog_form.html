@@ -5,39 +5,25 @@
     <div class="col-6">
         <div class="card box-shadow">
             <div class="card-header">
-                <h4 class="my-0 font-weight-normal">Добавление статьи</h4>
+                <h4 class="my-0 font-weight-normal">
+                    {% if form.instance.slug %}
+                    Изменение статьи
+                    {% else %}
+                    Добавление статьи
+                    {% endif %}
+                </h4>
             </div>
             <div class="card-body">
                 <form method="post" action="" class="form-floating" enctype="multipart/form-data">
                     {% csrf_token %}
-                    <div class="row">
-                        <div class="col-12 mb-2">
-                            <lable for="id_title">Заголовок:</lable>
-                            <input type="text" name="title" class="form-control" maxlength="100" required
-                                   id="id_title" placeholder="Введите заголовок статьи">
-                        </div>
-                        <div class="col-12 mb-2">
-                            <lable for="id_content">Содержимое:</lable>
-                            <textarea name="content" class="form-control" style="height: 225px;" id="id_content"
-                                      placeholder="Введите содержимое статьи"></textarea>
-                        </div>
-                        <div class="col-3 mb-2">
-                            <p>Изображение:</p>
-                        </div>
-                        <div class="col-9 mb-2">
-                            <input type="file" name="preview" id="id_preview">
-                        </div>
-                        <div class="col-12 mb-2">
-                            <label class="form-check-label" for="id_is_published">Опубликовать?</label>
-                            <input class="form-check-input" type="checkbox" id="id_is_published" name="is_published">
-                        </div>
-                        <div class="col-9 mb-2"></div>
-                        <div class="col-3 mb-2">
-                            <button type="submit" class="btn btn-lg btn-block btn-outline-primary form-control">
-                                Отправить
-                            </button>
-                        </div>
-                    </div>
+                    {{ form }}
+                    <button type="submit" class="btn btn-lg btn-block btn-outline-primary">
+                        {% if form.instance.slug %}
+                        Изменить
+                        {% else %}
+                        Добавить
+                        {% endif %}
+                    </button>
                 </form>
             </div>
         </div>
