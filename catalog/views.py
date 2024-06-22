@@ -70,6 +70,14 @@ class BlogDetailView(DetailView):
     slug_field = 'slug'
     slug_url_kwarg = 'slug'
 
+    def get_object(self, *args, **kwargs):
+        article = super().get_object(*args, **kwargs)
+        article.views_count += 1
+        article.save()
+
+        return article
+
+
 
 class BlogUpdateView(UpdateView):
     model = Blog
