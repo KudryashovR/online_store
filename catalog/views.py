@@ -3,7 +3,7 @@ from datetime import datetime
 from django.urls import reverse_lazy
 from django.views.generic import ListView, TemplateView, DetailView, CreateView
 
-from catalog.models import Product, Contact, Category
+from catalog.models import Product, Contact, Category, Blog
 
 
 class ProductListView(ListView):
@@ -52,3 +52,8 @@ class ProductCreateView(CreateView):
         context['categories'] = Category.objects.all().order_by('id')
 
         return context
+
+
+class BlogListView(ListView):
+    model = Blog
+    paginate_by = 10
