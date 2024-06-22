@@ -1,6 +1,8 @@
-from django import forms
+from django.core.mail import send_mail
 from django.db import models
 from django.utils.text import slugify
+
+from config import settings
 
 NULLABLE = {'blank': True, 'null': True}
 
@@ -59,6 +61,7 @@ class Blog(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     is_published = models.BooleanField(default=True, verbose_name="Опубликовано")
     views_count = models.PositiveIntegerField(default=0)
+    author_email = models.EmailField(verbose_name="E-mail автора", help_text="Введите E-mail автора статьи", **NULLABLE)
 
     def __str__(self):
         return self.title
@@ -68,6 +71,18 @@ class Blog(models.Model):
             self.slug = slugify(self.title)
 
         super().save(*args, **kwargs)
+
+        if self.views_count == 100:
+            self.send_congratulation_email()
+
+    def send_congratulation_email(self):
+        send_mail(
+            'Поздравляем!',
+            f'Ваша статья "{self.title}" набрала 100 просмотров!',
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[self.author_email],
+            fail_silently=False,
+        )
 
     class Meta:
         verbose_name = 'Статья'
