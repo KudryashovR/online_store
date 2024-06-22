@@ -26,8 +26,8 @@
                    href="{% url 'catalog:blog' %}">Вернуться к списку статей</a>
                 <a class="p-2 btn btn-outline-primary"
                    href="{% url 'catalog:blog_edit' blog.slug %}">Редактировать статью</a>
-                <a class="p-2 btn btn-outline-primary"
-                   href="#">Удалить статью</a>
+                <a class="p-2 btn btn-outline-danger"
+                   href="{% url 'catalog:blog_delete' blog.slug %}">Удалить статью</a>
             </div>
         </div>
     </div>
