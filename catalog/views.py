@@ -4,19 +4,14 @@ from django.shortcuts import render, get_object_or_404
 
 import datetime
 
+from django.views.generic import ListView
+
 from catalog.models import Product, Contact, Category, ProductForm
 
 
-def home(request):
-    products_list = Product.objects.all().order_by('id')
-    paginator = Paginator(products_list, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    context = {
-        'page_obj': page_obj,
-    }
-
-    return render(request, 'catalog/home.html', context)
+class ProductListView(ListView):
+    model = Product
+    paginate_by = 10
 
 
 def contacts(request):
