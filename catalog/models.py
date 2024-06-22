@@ -49,9 +49,19 @@ class Contact(models.Model):
         verbose_name_plural = 'Контакты'
 
 
-class ProductForm(forms.ModelForm):
+class Blog(models.Model):
+    title = models.CharField(max_length=200, verbose_name="Заголовок", help_text="Введите заголовок статьи")
+    slug = models.SlugField(max_length=200)
+    content = models.TextField(verbose_name="Содержание", help_text="Введите содержание статьи")
+    preview = models.ImageField(upload_to='blog/', verbose_name="Изображение",
+                                help_text="Загрузите изображение для превью статьи")
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_published = models.BooleanField(default=False)
+    views_count = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return self.title
+
     class Meta:
-        model = Product
-        fields = [
-            'name', 'description', 'preview', 'category', 'price'
-        ]
+        verbose_name = 'Статья'
+        verbose_name_plural = 'Статьи'
