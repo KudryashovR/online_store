@@ -1,9 +1,9 @@
 from datetime import datetime
 
 from django.urls import reverse_lazy
-from django.views.generic import ListView, TemplateView, DetailView, CreateView
+from django.views.generic import ListView, TemplateView, DetailView, CreateView, UpdateView, DeleteView
 
-from catalog.models import Product, Contact, Category
+from catalog.models import Product, Contact, Category, Blog
 
 
 class ProductListView(ListView):
@@ -52,3 +52,35 @@ class ProductCreateView(CreateView):
         context['categories'] = Category.objects.all().order_by('id')
 
         return context
+
+
+class BlogListView(ListView):
+    model = Blog
+    paginate_by = 10
+
+
+class BlogCreateView(CreateView):
+    model = Blog
+    fields = ('title', 'content', 'preview', 'is_published')
+    success_url = reverse_lazy('catalog:blog')
+
+
+class BlogDetailView(DetailView):
+    model = Blog
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'
+
+
+class BlogUpdateView(UpdateView):
+    model = Blog
+    fields = ('title', 'content', 'preview', 'is_published')
+    success_url = reverse_lazy('catalog:blog')
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'
+
+
+class BlogDeleteView(DeleteView):
+    model = Blog
+    success_url = reverse_lazy('catalog:blog')
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'

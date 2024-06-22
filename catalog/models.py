@@ -1,5 +1,6 @@
 from django import forms
 from django.db import models
+from django.utils.text import slugify
 
 NULLABLE = {'blank': True, 'null': True}
 
@@ -49,9 +50,25 @@ class Contact(models.Model):
         verbose_name_plural = 'Контакты'
 
 
-class ProductForm(forms.ModelForm):
+class Blog(models.Model):
+    title = models.CharField(max_length=200, verbose_name="Заголовок", help_text="Введите заголовок статьи")
+    slug = models.SlugField(max_length=200)
+    content = models.TextField(verbose_name="Содержание", help_text="Введите содержание статьи")
+    preview = models.ImageField(upload_to='blog/', verbose_name="Изображение",
+                                help_text="Загрузите изображение для превью статьи")
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_published = models.BooleanField(default=True, verbose_name="Опубликовано")
+    views_count = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+
+        super().save(*args, **kwargs)
+
     class Meta:
-        model = Product
-        fields = [
-            'name', 'description', 'preview', 'category', 'price'
-        ]
+        verbose_name = 'Статья'
+        verbose_name_plural = 'Статьи'
