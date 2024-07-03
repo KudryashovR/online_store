@@ -5,8 +5,10 @@
     <div class="col-3"></div>
     <div class="col-lg-6 col-md-6 col-sm-6">
         <div class="card mb-6 box-shadow">
-            <div class="card-body">
+            <div class="card-header">
                 <h1>{{ product.name }}</h1>
+            </div>
+            <div class="card-body">
                 {% if product.preview %}
                 <img src="{{ product.preview|media_redirection }}" class="img-fluid" alt="{{ product.name }}">
                 {% endif %}
@@ -14,8 +16,13 @@
                 <p><strong>Цена:</strong> {{ product.price }}</p>
                 <p><strong>Описание:</strong> {{ product.description }}</p>
             </div>
+            <div class="card-footer">
+                <a class="btn btn-outline-primary" href="{% url 'catalog:product_update' product.pk %}">Редактировать</a>
+                <a class="btn btn-outline-danger" href="{% url 'catalog:product_delete' product.pk %}">Удалить</a>
+                <a class="p-2 btn btn-outline-secondary" href="{% url 'catalog:home' %}">Назад</a>
+
+            </div>
         </div>
+        <div class="col-3"></div>
     </div>
-    <div class="col-3"></div>
-</div>
-{% endblock %}
+    {% endblock %}

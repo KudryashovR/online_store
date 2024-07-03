@@ -41,12 +41,12 @@ class ContactView(TemplateView):
 
 class ProductDetailView(DetailView):
     model = Product
+    form_class = ProductForm
 
 
 class ProductCreateView(CreateView):
     model = Product
     form_class = ProductForm
-    fields = ('name', 'description', 'preview', 'category', 'price')
     success_url = reverse_lazy('catalog:home')
 
     def get_context_data(self, **kwargs):
