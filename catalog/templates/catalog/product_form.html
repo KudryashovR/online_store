@@ -27,7 +27,7 @@
                             </div>
                             <div class="col-6 p-2">
                                 <a class="btn btn-lg btn-block btn-outline-secondary form-control"
-                                   href="{% url 'catalog:home' %}">Назад</a>
+                                   href="{% if form.instance.pk %}{% url 'catalog:product_detail' product.pk %}{% else %}{% url 'catalog:home' %}{% endif %}">Назад</a>
                             </div>
                         </div>
                     </div>
