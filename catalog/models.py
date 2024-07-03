@@ -103,3 +103,7 @@ class ProductVersion(models.Model):
         if self.is_current:
             ProductVersion.objects.filter(product=self.product, is_current=False).update(is_current=False)
             super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = 'Версия продукта'
+        verbose_name_plural = 'Версии продукта'
