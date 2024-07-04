@@ -2,11 +2,13 @@
 {% block content %}
 {% load custom_filters %}
 <div class="row text-start">
-    <div class="col-3"></div>
     <div class="col-lg-6 col-md-6 col-sm-6">
         <div class="card mb-6 box-shadow">
             <div class="card-header">
                 <h1>{{ product.name }}</h1>
+                {% if product_version %}
+                <p>Текущая версия: {{ product_version.version_name }} ({{ product_version.version_number }})</p>
+                {% endif %}
             </div>
             <div class="card-body">
                 {% if product.preview %}
@@ -17,12 +19,12 @@
                 <p><strong>Описание:</strong> {{ product.description }}</p>
             </div>
             <div class="card-footer">
-                <a class="btn btn-outline-primary" href="{% url 'catalog:product_update' product.pk %}">Редактировать</a>
+                <a class="btn btn-outline-primary"
+                   href="{% url 'catalog:product_update' product.pk %}">Редактировать</a>
                 <a class="btn btn-outline-danger" href="{% url 'catalog:product_delete' product.pk %}">Удалить</a>
                 <a class="p-2 btn btn-outline-secondary" href="{% url 'catalog:home' %}">Назад</a>
-
             </div>
         </div>
-        <div class="col-3"></div>
     </div>
-    {% endblock %}
+</div>
+{% endblock %}

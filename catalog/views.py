@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from django.forms import inlineformset_factory
 from django.urls import reverse_lazy
 from django.views.generic import ListView, TemplateView, DetailView, CreateView, UpdateView, DeleteView
 
@@ -19,7 +20,7 @@ class ProductListView(ListView):
             current_version = product.versions.filter(is_current=True).first()
             products_with_versions.append((product, current_version))
         context['products_with_versions'] = products_with_versions
-        print(context['products_with_versions'][0][1].version_number)
+
         return context
 
 
@@ -27,7 +28,7 @@ class ContactView(TemplateView):
     model = Contact
     template_name = 'catalog/contact_list.html'
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         if request.method == 'POST':
             name = request.POST.get('name')
             phone = request.POST.get('phone')
@@ -54,6 +55,14 @@ class ProductDetailView(DetailView):
     model = Product
     form_class = ProductForm
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        product = self.get_object()
+        product_version = product.versions.filter(is_current=True).first()
+        context['product_version'] = product_version
+
+        return context
+
 
 class ProductCreateView(CreateView):
     model = Product
@@ -71,6 +80,18 @@ class ProductUpdateView(UpdateView):
     model = Product
     form_class = ProductForm
     success_url = reverse_lazy('catalog:home')
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        formset = inlineformset_factory(self.model, ProductVersion, form=VersionForm, extra=1)
+
+        if self.request.method == 'POST':
+            formset = formset(self.request.POST, instance=self.object)
+        else:
+            formset = formset(instance=self.object)
+        context_data['formset'] = formset
+
+        return context_data
 
 
 class ProductDeleteView(DeleteView):
