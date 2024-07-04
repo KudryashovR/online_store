@@ -3,8 +3,8 @@ from datetime import datetime
 from django.urls import reverse_lazy
 from django.views.generic import ListView, TemplateView, DetailView, CreateView, UpdateView, DeleteView
 
-from catalog.forms import ProductForm
-from catalog.models import Product, Contact, Category, Blog
+from catalog.forms import ProductForm, VersionForm
+from catalog.models import Product, Contact, Category, Blog, ProductVersion
 
 
 class ProductListView(ListView):
@@ -120,3 +120,20 @@ class BlogDeleteView(DeleteView):
     success_url = reverse_lazy('catalog:blog')
     slug_field = 'slug'
     slug_url_kwarg = 'slug'
+
+
+class VersionCreateView(CreateView):
+    model = ProductVersion
+    form_class = VersionForm
+    success_url = reverse_lazy('product_list')
+
+
+class VersionUpdateView(UpdateView):
+    model = ProductVersion
+    form_class = VersionForm
+    success_url = reverse_lazy('product_list')
+
+
+class VersionDeleteView(DeleteView):
+    model = ProductVersion
+    success_url = reverse_lazy('product_list')
