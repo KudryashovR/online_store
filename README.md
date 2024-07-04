@@ -13,6 +13,7 @@
 - Добавление новых товаров;
 - Добавление, изменение и удаление статей блога;
 - Отправка уведомления на адрес электронной почты при достижении статьей 100 просмотров.
+- Вывод на страницу товара версии.
 
 ## Установка
 
@@ -50,17 +51,12 @@ EMAIL_HOST_PASSWORD='<your_mail_passvord>'
 poetry shell
 ```
 
-2. Создайте базу данных `catalog` и, при необходимости, отредактируйте параметры подключения к БД в файле `settings.py`:
+2. Создайте базу данных `catalog` и отредактируйте параметры подключения к БД в файле `.env`:
 
-```python
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'catalog',
-        'USER': 'postgres',
-        'PASSWORD': '11235813',
-    }
-}
+```
+DATABASES_NAME='catalog'
+DATABASES_USER='<your_DB_user>'
+DATABASES_PASSWORD='<you_password_for_DB_user>'
 ```
 
 3. Проведите миграции:
