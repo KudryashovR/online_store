@@ -1,21 +1,35 @@
 from datetime import datetime
 
+from django.core.exceptions import ValidationError
+from django.forms import inlineformset_factory
 from django.urls import reverse_lazy
 from django.views.generic import ListView, TemplateView, DetailView, CreateView, UpdateView, DeleteView
 
-from catalog.models import Product, Contact, Category, Blog
+from catalog.forms import ProductForm, VersionForm
+from catalog.models import Product, Contact, Category, Blog, ProductVersion
 
 
 class ProductListView(ListView):
     model = Product
     paginate_by = 10
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        products_with_versions = []
+
+        for product in Product.objects.all():
+            current_version = product.versions.filter(is_current=True).first()
+            products_with_versions.append((product, current_version))
+        context['products_with_versions'] = products_with_versions
+
+        return context
+
 
 class ContactView(TemplateView):
     model = Contact
     template_name = 'catalog/contact_list.html'
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         if request.method == 'POST':
             name = request.POST.get('name')
             phone = request.POST.get('phone')
@@ -40,18 +54,80 @@ class ContactView(TemplateView):
 
 class ProductDetailView(DetailView):
     model = Product
+    form_class = ProductForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        current_version = self.object.versions.filter(is_current=True).first()
+        context['product_version'] = current_version
+
+        return context
 
 
 class ProductCreateView(CreateView):
     model = Product
-    fields = ('name', 'description', 'preview', 'category', 'price')
+    form_class = ProductForm
     success_url = reverse_lazy('catalog:home')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['categories'] = Category.objects.all().order_by('id')
+        SubjectFormset = inlineformset_factory(Product, ProductVersion, form=VersionForm, extra=1)
+
+        if self.request.method == 'POST':
+            context['formset'] = SubjectFormset(self.request.POST)
+        else:
+            context['formset'] = SubjectFormset()
 
         return context
+
+    def form_valid(self, form):
+        formset = self.get_context_data()['formset']
+        self.object = form.save()
+
+        if formset.is_valid():
+            formset.instance = self.object
+            formset.save()
+
+        return super().form_valid(form)
+
+
+class ProductUpdateView(UpdateView):
+    model = Product
+    form_class = ProductForm
+    success_url = reverse_lazy('catalog:home')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        SubjectFormset = inlineformset_factory(Product, ProductVersion, form=VersionForm, extra=1)
+
+        if self.request.method == 'POST':
+            context['formset'] = SubjectFormset(self.request.POST, instance=self.object)
+        else:
+            context['formset'] = SubjectFormset(instance=self.object)
+
+        return context
+
+    def form_valid(self, form):
+        formset = self.get_context_data()['formset']
+        self.object = form.save()
+
+        if formset.is_valid():
+            formset.instance = self.object
+            formset.save()
+
+        active_versions_count = ProductVersion.objects.filter(product=self.object, is_current=True).count()
+
+        if active_versions_count > 1:
+            form.add_error(None, 'Допустима только одна активная версия для каждого продукта.')
+
+            return self.form_invalid(form)
+
+        return super().form_valid(form)
+
+
+class ProductDeleteView(DeleteView):
+    model = Product
+    success_url = reverse_lazy('catalog:home')
 
 
 class BlogListView(ListView):
