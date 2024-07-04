@@ -90,7 +90,7 @@ class Blog(models.Model):
 
 
 class ProductVersion(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='Versions',
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='versions',
                                 help_text='Введите версию продукта')
     version_number = models.CharField(max_length=10, verbose_name='Номер версии', help_text='Введите номер версии')
     version_name = models.CharField(max_length=100, verbose_name='Название версии', help_text='Введите название версии')
