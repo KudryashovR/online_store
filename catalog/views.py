@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from django.db import transaction
+from django.core.exceptions import ValidationError
 from django.forms import inlineformset_factory
 from django.urls import reverse_lazy
 from django.views.generic import ListView, TemplateView, DetailView, CreateView, UpdateView, DeleteView
@@ -58,12 +58,8 @@ class ProductDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        for product in Product.objects.all():
-            current_version = product.versions.filter(is_current=True).first()
-            product_version = current_version
-
-        context['product_version'] = product_version
+        current_version = self.object.versions.filter(is_current=True).first()
+        context['product_version'] = current_version
 
         return context
 
@@ -119,6 +115,13 @@ class ProductUpdateView(UpdateView):
             formset.instance = self.object
             formset.save()
 
+        active_versions_count = ProductVersion.objects.filter(product=self.object, is_current=True).count()
+
+        if active_versions_count > 1:
+            form.add_error(None, 'Допустима только одна активная версия для каждого продукта.')
+
+            return self.form_invalid(form)
+
         return super().form_valid(form)
 
 
@@ -169,20 +172,3 @@ class BlogDeleteView(DeleteView):
     success_url = reverse_lazy('catalog:blog')
     slug_field = 'slug'
     slug_url_kwarg = 'slug'
-
-
-class VersionCreateView(CreateView):
-    model = ProductVersion
-    form_class = VersionForm
-    success_url = reverse_lazy('product_list')
-
-
-class VersionUpdateView(UpdateView):
-    model = ProductVersion
-    form_class = VersionForm
-    success_url = reverse_lazy('product_list')
-
-
-class VersionDeleteView(DeleteView):
-    model = ProductVersion
-    success_url = reverse_lazy('product_list')

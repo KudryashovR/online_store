@@ -1,4 +1,5 @@
 from django import forms
+
 from .models import Product, ProductVersion
 
 FORBIDDEN_WORDS = ['казино', 'криптовалюта', 'крипта', 'биржа', 'дешево', 'бесплатно', 'обман', 'полиция', 'радар']
