@@ -1,5 +1,6 @@
 {% extends 'catalog/base.html' %}
 {% block content %}
+{% load crispy_forms_tags %}
 <form method="post" action="" class="form-floating" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="row">
@@ -15,7 +16,7 @@
                         {% endif %}
                     </div>
                     <div class="card-body">
-                        {{ form }}
+                        {{ form|crispy }}
                     </div>
                     <div class="card-footer">
                         <div class="row">
@@ -32,6 +33,21 @@
                         </div>
                     </div>
                 </form>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="card mb-6 box-shadow">
+                <div class="card-header">
+                    <h1>Версия продукта</h1>
+                </div>
+                <div class="card-body">
+                    {{ formset.management_form }}
+                    {% for form in formset.forms %}
+                    {{ form|crispy }}
+
+                    {% endfor %}
+                </div>
+                <div class="card-footer"></div>
             </div>
         </div>
     </div>
