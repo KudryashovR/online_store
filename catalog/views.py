@@ -11,6 +11,17 @@ class ProductListView(ListView):
     model = Product
     paginate_by = 10
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        products_with_versions = []
+
+        for product in Product.objects.all():
+            current_version = product.versions.filter(is_current=True).first()
+            products_with_versions.append((product, current_version))
+        context['products_with_versions'] = products_with_versions
+        print(context['products_with_versions'][0][1].version_number)
+        return context
+
 
 class ContactView(TemplateView):
     model = Contact

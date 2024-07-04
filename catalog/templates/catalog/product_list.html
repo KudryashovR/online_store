@@ -9,11 +9,14 @@
     </div>
 </div>
 <div class="row text-center">
-    {% for product in object_list %}
+    {% for product, current_version in products_with_versions %}
     <div class="col-3">
         <div class="card mb-4 box-shadow">
             <div class="card-header">
                 <h4 class="my-0 font-weight-normal">{{ product.name }}</h4>
+                {% if current_version %}
+                <p>Текущая версия: {{ current_version.version_name }} ({{ current_version.version_number }})</p>
+                {% endif %}
             </div>
             <div class="card-body">
                 {% if product.preview %}
