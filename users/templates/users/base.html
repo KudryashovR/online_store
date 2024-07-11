@@ -1,0 +1,32 @@
+<!doctype html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Online Store</title>
+    <link rel="stylesheet" href="{% static 'catalog/css/bootstrap.min.css' %}">
+</head>
+<body>
+<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+    <h1 class="display-4">Online Store</h1>
+    <p class="lead">Online Store - это отличный вариант для покупки товаров</p>
+</div>
+
+<div class="container">
+
+    {% block content %}
+    {% endblock %}
+
+    <footer class="pt-4 my-md-5 pt-md-5 border-top">
+        <div class="row">
+            <div class="col-12 col-md">
+                Online Store
+                <small class="d-block mb-3 text-muted">&copy; 2024</small>
+            </div>
+        </div>
+    </footer>
+</div>
+<script src="{% static 'catalog/js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>
