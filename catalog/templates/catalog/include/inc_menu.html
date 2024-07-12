@@ -3,6 +3,7 @@
     <nav class="ms-5">
         <a class="p-2 btn btn-outline-primary" href="{% url 'catalog:home' %}">Каталог</a>
         <a class="p-2 btn btn-outline-primary" href="{% url 'catalog:contacts' %}">Контакты</a>
+        <a class="p-2 btn btn-outline-primary" href="{% url 'users:profile_edit' %}">Профиль</a>
         <form method="post" action="{% url 'logout' %}">
             {% csrf_token %}
             <button class="p-2 btn btn-outline-primary" type="submit">Выход</button>

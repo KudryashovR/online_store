@@ -6,10 +6,11 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
 from django.utils.crypto import get_random_string
 from django.views import View
-from django.views.generic import CreateView
+from django.views.generic import CreateView, UpdateView
 
+from catalog.mixins import CustomLoginRequiredMixin
 from config.settings import env, EMAIL_HOST_USER
-from users.forms import CustomUserCreationForm
+from users.forms import CustomUserCreationForm, ProfileForm
 from users.models import User
 
 
@@ -66,3 +67,13 @@ class PasswordResetView(View):
     @staticmethod
     def send_new_password_email(user, new_password):
         send_mail("Your new password", f"Your new password is: {new_password}", EMAIL_HOST_USER, [user.email])
+
+
+class ProfileUpdateView(CustomLoginRequiredMixin, UpdateView):
+    model = User
+    form_class = ProfileForm
+    template_name = 'users/profile_edit.html'
+    success_url = reverse_lazy('catalog:home')
+
+    def get_object(self):
+        return User.objects.get(email=self.request.user)
