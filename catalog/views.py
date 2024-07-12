@@ -1,15 +1,15 @@
 from datetime import datetime
 
-from django.core.exceptions import ValidationError
 from django.forms import inlineformset_factory
 from django.urls import reverse_lazy
 from django.views.generic import ListView, TemplateView, DetailView, CreateView, UpdateView, DeleteView
 
 from catalog.forms import ProductForm, VersionForm
-from catalog.models import Product, Contact, Category, Blog, ProductVersion
+from catalog.mixins import CustomLoginRequiredMixin
+from catalog.models import Product, Contact, Blog, ProductVersion
 
 
-class ProductListView(ListView):
+class ProductListView(CustomLoginRequiredMixin, ListView):
     model = Product
     paginate_by = 10
 
@@ -25,7 +25,7 @@ class ProductListView(ListView):
         return context
 
 
-class ContactView(TemplateView):
+class ContactView(CustomLoginRequiredMixin, TemplateView):
     model = Contact
     template_name = 'catalog/contact_list.html'
 
@@ -52,7 +52,7 @@ class ContactView(TemplateView):
         return context
 
 
-class ProductDetailView(DetailView):
+class ProductDetailView(CustomLoginRequiredMixin, DetailView):
     model = Product
     form_class = ProductForm
 
@@ -64,7 +64,7 @@ class ProductDetailView(DetailView):
         return context
 
 
-class ProductCreateView(CreateView):
+class ProductCreateView(CustomLoginRequiredMixin, CreateView):
     model = Product
     form_class = ProductForm
     success_url = reverse_lazy('catalog:home')
@@ -91,7 +91,7 @@ class ProductCreateView(CreateView):
         return super().form_valid(form)
 
 
-class ProductUpdateView(UpdateView):
+class ProductUpdateView(CustomLoginRequiredMixin, UpdateView):
     model = Product
     form_class = ProductForm
     success_url = reverse_lazy('catalog:home')
@@ -125,12 +125,12 @@ class ProductUpdateView(UpdateView):
         return super().form_valid(form)
 
 
-class ProductDeleteView(DeleteView):
+class ProductDeleteView(CustomLoginRequiredMixin, DeleteView):
     model = Product
     success_url = reverse_lazy('catalog:home')
 
 
-class BlogListView(ListView):
+class BlogListView(CustomLoginRequiredMixin, ListView):
     model = Blog
     paginate_by = 10
 
@@ -138,13 +138,13 @@ class BlogListView(ListView):
         return Blog.objects.filter(is_published=True)
 
 
-class BlogCreateView(CreateView):
+class BlogCreateView(CustomLoginRequiredMixin, CreateView):
     model = Blog
     fields = ('title', 'content', 'preview', 'is_published')
     success_url = reverse_lazy('catalog:blog')
 
 
-class BlogDetailView(DetailView):
+class BlogDetailView(CustomLoginRequiredMixin, DetailView):
     model = Blog
     slug_field = 'slug'
     slug_url_kwarg = 'slug'
@@ -157,7 +157,7 @@ class BlogDetailView(DetailView):
         return article
 
 
-class BlogUpdateView(UpdateView):
+class BlogUpdateView(CustomLoginRequiredMixin, UpdateView):
     model = Blog
     fields = ('title', 'content', 'preview', 'is_published')
     slug_field = 'slug'
@@ -167,7 +167,7 @@ class BlogUpdateView(UpdateView):
         return reverse_lazy('catalog:blog_detail', kwargs={'slug': self.object.slug})
 
 
-class BlogDeleteView(DeleteView):
+class BlogDeleteView(CustomLoginRequiredMixin, DeleteView):
     model = Blog
     success_url = reverse_lazy('catalog:blog')
     slug_field = 'slug'

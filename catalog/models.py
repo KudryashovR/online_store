@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from django.db import models
 from django.utils.text import slugify
@@ -5,6 +6,7 @@ from django.utils.text import slugify
 from config import settings
 
 NULLABLE = {'blank': True, 'null': True}
+User = get_user_model()
 
 
 class Product(models.Model):
@@ -17,6 +19,7 @@ class Product(models.Model):
                                 help_text='Введите цену продукта')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products', default=1)
 
     def __str__(self):
         return self.name
