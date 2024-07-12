@@ -1,0 +1,13 @@
+{% extends 'users/base.html' %}
+{% block content %}
+{% load crispy_forms_tags %}
+<div class="container">
+    <h1>Редактировать профиль</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit">Сохранить изменения</button>
+    </form>
+    <a href="{% url 'catalog:home' %}">Назад</a>
+</div>
+{% endblock %}

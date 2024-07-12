@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "crispy_bootstrap4",
 
     'catalog',
+    'users'
 ]
 
 MIDDLEWARE = [
@@ -158,3 +159,7 @@ EMAIL_ADMIN = EMAIL_HOST_USER
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+AUTH_USER_MODEL = 'users.User'
+
+LOGOUT_REDIRECT_URL = '/users/login/'
