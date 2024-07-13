@@ -1,3 +1,5 @@
+import uuid
+
 from django.apps import apps
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.hashers import make_password
@@ -149,3 +151,9 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+
+
+class VerificationToken(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)

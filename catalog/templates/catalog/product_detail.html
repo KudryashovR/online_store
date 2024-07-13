@@ -19,9 +19,11 @@
                 <p><strong>Описание:</strong> {{ product.description }}</p>
             </div>
             <div class="card-footer">
+                {% if user == product.owner %}
                 <a class="btn btn-outline-primary"
                    href="{% url 'catalog:product_update' product.pk %}">Редактировать</a>
                 <a class="btn btn-outline-danger" href="{% url 'catalog:product_delete' product.pk %}">Удалить</a>
+                {% endif %}
                 <a class="p-2 btn btn-outline-secondary" href="{% url 'catalog:home' %}">Назад</a>
             </div>
         </div>

@@ -42,7 +42,7 @@ class Product(models.Model):
                                 help_text='Введите цену продукта')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products', default=1)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products')
 
     def __str__(self):
         return self.name
