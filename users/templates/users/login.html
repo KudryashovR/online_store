@@ -4,10 +4,10 @@
 <form method="post">
     {% csrf_token %}
     {{ form|crispy }}
-    <button type="submit">Войти</button>
+    <button class="p-2 btn btn-outline-primary" type="submit">Войти</button>
 </form>
 <form method="get" action="../password_reset/">
-    <button type="submit">Забыли пароль?</button>
+    <button class="p-2 btn btn-outline-primary" type="submit">Забыли пароль?</button>
 </form>
-<a href="{% url 'catalog:home' %}">На главную</a>
+<a class="p-2 btn btn-outline-primary" href="{% url 'catalog:home' %}">На главную</a>
 {% endblock %}

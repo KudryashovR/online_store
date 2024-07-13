@@ -4,7 +4,7 @@
 <form method="post">
     {% csrf_token %}
     {{ form|crispy }}
-    <button type="submit">Register</button>
+    <button class="p-2 btn btn-outline-primary" type="submit">Зарегистрироваться</button>
 </form>
-<a href="{% url 'catalog:home' %}">Назад </a>
+<a class="p-2 btn btn-outline-primary" href="{% url 'catalog:home' %}">Назад</a>
 {% endblock %}
