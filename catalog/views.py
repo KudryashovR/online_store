@@ -9,7 +9,7 @@ from catalog.mixins import CustomLoginRequiredMixin
 from catalog.models import Product, Contact, Blog, ProductVersion
 
 
-class ProductListView(CustomLoginRequiredMixin, ListView):
+class ProductListView(ListView):
     """
     Класс-представление для отображения списка продуктов.
 
@@ -155,6 +155,7 @@ class ProductCreateView(CustomLoginRequiredMixin, CreateView):
         return context
 
     def form_valid(self, form):
+        form.instance.owner = self.request.user
         formset = self.get_context_data()['formset']
         self.object = form.save()
 

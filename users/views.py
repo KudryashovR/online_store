@@ -3,15 +3,16 @@ from django.contrib.auth.views import LoginView
 from django.core.mail import send_mail
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
+from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.views import View
 from django.views.generic import CreateView, UpdateView
 
 from catalog.mixins import CustomLoginRequiredMixin
-from config.settings import env, EMAIL_HOST_USER
+from config.settings import env, EMAIL_HOST_USER, DEFAULT_FROM_EMAIL
 from users.forms import CustomUserCreationForm, ProfileForm
-from users.models import User
+from users.models import User, VerificationToken
 
 
 class RegisterView(CreateView):
@@ -56,9 +57,12 @@ class RegisterView(CreateView):
 
     @staticmethod
     def send_verification_email(user):
-        send_mail("Verify your email", "Please verify your email by clicking the following link:\n" + env(
-            'MY_IP_ADDRESS') + "/verify/{}/'".format(user.id), EMAIL_HOST_USER, [user.email],
-                  fail_silently=False)
+        token = VerificationToken.objects.create(user=user)
+        verification_link = env('MY_IP_ADDRESS') + reverse('users:verify_email', kwargs={'token': str(token.token)})
+
+        subject = 'Verify your email'
+        message = f'Please click the link to verify your email: {verification_link}'
+        send_mail(subject, message, DEFAULT_FROM_EMAIL, [user.email])
 
 
 class VerifyEmailView(View):
@@ -75,7 +79,7 @@ class VerifyEmailView(View):
         о успешной верификации email.
     """
 
-    def get(self, request, user_id):
+    def get(self, request, token):
         """
         Обрабатывает GET-запрос для верификации email.
 
@@ -92,9 +96,19 @@ class VerifyEmailView(View):
             Возвращает сообщение о успешной верификации email.
         """
 
-        user = get_object_or_404(User, id=user_id)
+        verification_token = get_object_or_404(VerificationToken, token=token)
+        user = verification_token.user
+        time_elapsed = timezone.now() - verification_token.created_at
+
+        if time_elapsed.days > 1:
+            verification_token.delete()
+            RegisterView.send_verification_email(user)
+
+            return HttpResponse("The token has expired. A new confirmation email has been sent.")
+
         user.is_active = True
         user.save()
+        verification_token.delete()
 
         return HttpResponse("Email verified successfully")
 
