@@ -165,6 +165,13 @@ class ProductCreateView(CustomLoginRequiredMixin, CreateView):
 
         return super().form_valid(form)
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+
+        kwargs['is_create'] = True
+
+        return kwargs
+
 
 class ProductUpdateView(CustomLoginRequiredMixin, UpdateView):
     """

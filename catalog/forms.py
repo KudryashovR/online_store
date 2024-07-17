@@ -28,7 +28,7 @@ class ProductForm(forms.ModelForm):
         - fields (list): Полный список полей формы, который позднее может фильтроваться на основе прав пользователя.
     """
 
-    def __init__(self, user_id=None, *args, **kwargs):
+    def __init__(self, user_id=None, is_create=False, *args, **kwargs):
         """
         Инициализация формы с возможностью фильтрации полей на основе прав пользователя.
 
@@ -38,21 +38,24 @@ class ProductForm(forms.ModelForm):
             - **kwargs: Именованные аргументы для функции-родителя.
         """
 
-        super(ProductForm, self).__init__(*args, **kwargs)
+        if not is_create:
+            super(ProductForm, self).__init__(*args, **kwargs)
 
-        available_fields = ['name', 'preview', 'price']
+            available_fields = ['name', 'preview', 'price']
 
-        if user_id:
-            if user_id.has_perm('catalog.can_cancel_publication'):
-                available_fields.append('is_published')
-            if user_id.has_perm('catalog.can_change_description'):
-                available_fields.append('description')
-            if user_id.has_perm('catalog.can_change_category'):
-                available_fields.append('category')
+            if user_id:
+                if user_id.has_perm('catalog.can_cancel_publication'):
+                    available_fields.append('is_published')
+                if user_id.has_perm('catalog.can_change_description'):
+                    available_fields.append('description')
+                if user_id.has_perm('catalog.can_change_category'):
+                    available_fields.append('category')
 
-        self.fields = {
-            key: self.fields[key] for key in available_fields
-        }
+            self.fields = {
+                key: self.fields[key] for key in available_fields
+            }
+        else:
+            super(ProductForm, self).__init__(*args, **kwargs)
 
     class Meta:
         model = Product
