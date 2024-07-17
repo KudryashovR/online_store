@@ -4,7 +4,9 @@
 <div class="row">
     <div class="col-10"></div>
     <div class="col-2">
+        {% if perms.catalog.add_blog %}
         <a class="p-2 btn btn-outline-primary form-control mb-2" href="{% url 'catalog:new_blog' %}">Добавить статью</a>
+        {% endif %}
     </div>
 </div>
 <div class="row text-center">
