@@ -168,22 +168,30 @@ class ProductCreateView(CustomLoginRequiredMixin, CreateView):
 
 class ProductUpdateView(CustomLoginRequiredMixin, UpdateView):
     """
-    Класс-представление для обновления существующего продукта.
-
-    Наследует:
-    CustomLoginRequiredMixin (миксин): Обеспечивает доступ к представлению только для авторизованных пользователей.
-    UpdateView (UpdateView): Базовое представление для обновления существующего объекта.
+    Представление для обновления информации о продукте.
 
     Атрибуты класса:
-    model (Model): Модель, для которой создается представление (Product).
-    form_class (ModelForm): Форма, используемая для обновления объекта продукта.
-    success_url (str): URL перенаправления после успешного обновления объекта.
+        - model (Model): Модель, для которой будет использоваться представление.
+        - form_class (Form): Форма, которую будет использовать представление.
+        - success_url (str): URL-адрес для перенаправления после успешного обновления продукта.
 
     Методы:
-    get_context_data(**kwargs) (dict): Переопределенный метод для добавления дополнительного контекста (набор форм
-                                       версий продукта).
-    form_valid(form) (HttpResponse): Переопределенный метод для обработки валидной формы и сохранения объекта
-                                     и его версий. Проверяет, чтобы была только одна активная версия продукта.
+        - get_context_data(**kwargs): Возвращает контекст данных для шаблона, включая набор форм для связанных версий
+                                      продукта.
+        Аргументы:
+            - kwargs: Дополнительные ключевые аргументы.
+
+        - form_valid(form): Сохраняет форму и связанные наборы форм, а также проверяет наличие более одной активной
+                            версии продукта.
+        Аргументы:
+            - form: Форма продукта.
+        Возвращает:
+            - HttpResponse: Ответ с перенаправлением при успешном обновлении или ответ с ошибками при неудаче.
+
+        - get_form_kwargs(): Возвращает аргументы, которые будут переданы в форму при ее создании, включая
+                             ID пользователя.
+        Возвращает:
+            - dict: Аргументы для создания формы.
     """
 
     model = Product
@@ -191,6 +199,16 @@ class ProductUpdateView(CustomLoginRequiredMixin, UpdateView):
     success_url = reverse_lazy('catalog:home')
 
     def get_context_data(self, **kwargs):
+        """
+        Получает контекст данных для шаблона.
+
+        Аргументы:
+            - kwargs: Дополнительные ключевые аргументы.
+
+        Возвращает:
+            - dict: Контекст данных для шаблона.
+        """
+
         context = super().get_context_data(**kwargs)
 
         SubjectFormset = inlineformset_factory(Product, ProductVersion, form=VersionForm, extra=1)
@@ -203,6 +221,16 @@ class ProductUpdateView(CustomLoginRequiredMixin, UpdateView):
         return context
 
     def form_valid(self, form):
+        """
+        Проверяет валидность формы и набора форм, сохраняет их и проверяет количество активных версий продукта.
+
+        Аргументы:
+            - form: Форма продукта.
+
+        Возвращает:
+            - HttpResponse: Ответ с перенаправлением при успешном обновлении или ответ с ошибками при неудаче.
+        """
+
         formset = self.get_context_data()['formset']
         self.object = form.save()
 
@@ -218,6 +246,20 @@ class ProductUpdateView(CustomLoginRequiredMixin, UpdateView):
             return self.form_invalid(form)
 
         return super().form_valid(form)
+
+    def get_form_kwargs(self):
+        """
+        Получает аргументы, которые будут переданы в форму при ее создании.
+
+        Возвращает:
+            - dict: Аргументы для создания формы.
+        """
+
+        kwargs = super().get_form_kwargs()
+
+        kwargs['user_id'] = self.request.user
+
+        return kwargs
 
 
 class ProductDeleteView(CustomLoginRequiredMixin, DeleteView):
