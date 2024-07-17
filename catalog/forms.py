@@ -7,28 +7,71 @@ FORBIDDEN_WORDS = ['казино', 'криптовалюта', 'крипта', '
 
 class ProductForm(forms.ModelForm):
     """
-    Класс ProductForm представляет собой форму для модели Product.
+    Форма для модели Product, адаптированная для фильтрации полей на основе прав пользователя.
 
-    Вложенный класс Meta:
-        - model: Указывает модель, для которой создается форма (в данном случае, модель Product).
-        - fields (list): Определяет список полей модели, которые будут включены в форму. Здесь это поля 'name',
-                         'description', 'preview', 'category' и 'price'.
+    Параметры:
+        - user_id (User, optional): Объект пользователя для проверки прав на доступ к определенным полям.
+
+    Атрибуты:
+        - available_fields (list): Список полей, доступных для пользователя в зависимости от его прав доступа.
 
     Методы:
-        - clean_name: Метод валидации для поля 'name'. Проверяет, что в названии продукта не содержатся запрещенные
-                      слова. Если запрещенное слово найдено, вызывается исключение ValidationError.
-        - clean_description: Метод валидации для поля 'description'. Проверяет, что в описании продукта не содержатся
-                             запрещенные слова. Если запрещенное слово найдено, вызывается исключение ValidationError.
+        - __init__(user_id=None, *args, **kwargs): Инициализирует форму и фильтрует доступные поля на основе прав
+                                                   пользователя.
+        - clean_name(): Проверяет поле 'name' на наличие запрещенных слов и выбрасывает ValidationError, если запретные
+                        слова найдены.
+        - clean_description(): Проверяет поле 'description' на наличие запрещенных слов и выбрасывает ValidationError,
+                               если запретные слова найдены.
 
-    Переменные:
-        - FORBIDDEN_WORDS (list): Список слов, которые запрещены для использования в названии и описании продукта.
+    Класс Meta:
+        - model (Product): Связанная модель Django.
+        - fields (list): Полный список полей формы, который позднее может фильтроваться на основе прав пользователя.
     """
+
+    def __init__(self, user_id=None, is_create=False, *args, **kwargs):
+        """
+        Инициализация формы с возможностью фильтрации полей на основе прав пользователя.
+
+        Параметры:
+            - user_id (User, optional): Объект пользователя для проверки прав на доступ к определенным полям.
+            - *args: Аргументы для функции-родителя.
+            - **kwargs: Именованные аргументы для функции-родителя.
+        """
+
+        if not is_create:
+            super(ProductForm, self).__init__(*args, **kwargs)
+
+            available_fields = ['name', 'preview', 'price']
+
+            if user_id:
+                if user_id.has_perm('catalog.can_cancel_publication'):
+                    available_fields.append('is_published')
+                if user_id.has_perm('catalog.can_change_description'):
+                    available_fields.append('description')
+                if user_id.has_perm('catalog.can_change_category'):
+                    available_fields.append('category')
+
+            self.fields = {
+                key: self.fields[key] for key in available_fields
+            }
+        else:
+            super(ProductForm, self).__init__(*args, **kwargs)
 
     class Meta:
         model = Product
-        fields = ['name', 'description', 'preview', 'category', 'price']
+        fields = ['name', 'description', 'preview', 'category', 'price', 'is_published']
 
     def clean_name(self):
+        """
+        Проверяет поле 'name' на наличие запрещенных слов.
+
+        Возвращает:
+            - str: Возвращает очищенное значение поля 'name'.
+
+        Исключения:
+            - ValidationError: Если найдено запрещенное слово в названии.
+        """
+
         name = self.cleaned_data.get('name')
         for word in FORBIDDEN_WORDS:
             if word in name.lower():
@@ -36,6 +79,16 @@ class ProductForm(forms.ModelForm):
         return name
 
     def clean_description(self):
+        """
+        Проверяет поле 'description' на наличие запрещенных слов.
+
+        Возвращает:
+            - str: Возвращает очищенное значение поля 'description'.
+
+        Исключения:
+            - ValidationError: Если найдено запрещенное слово в описании.
+        """
+
         description = self.cleaned_data.get('description')
         for word in FORBIDDEN_WORDS:
             if word in description.lower():

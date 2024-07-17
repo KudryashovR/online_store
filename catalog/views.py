@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.forms import inlineformset_factory
 from django.urls import reverse_lazy
 from django.views.generic import ListView, TemplateView, DetailView, CreateView, UpdateView, DeleteView
@@ -165,25 +166,40 @@ class ProductCreateView(CustomLoginRequiredMixin, CreateView):
 
         return super().form_valid(form)
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+
+        kwargs['is_create'] = True
+
+        return kwargs
+
 
 class ProductUpdateView(CustomLoginRequiredMixin, UpdateView):
     """
-    Класс-представление для обновления существующего продукта.
-
-    Наследует:
-    CustomLoginRequiredMixin (миксин): Обеспечивает доступ к представлению только для авторизованных пользователей.
-    UpdateView (UpdateView): Базовое представление для обновления существующего объекта.
+    Представление для обновления информации о продукте.
 
     Атрибуты класса:
-    model (Model): Модель, для которой создается представление (Product).
-    form_class (ModelForm): Форма, используемая для обновления объекта продукта.
-    success_url (str): URL перенаправления после успешного обновления объекта.
+        - model (Model): Модель, для которой будет использоваться представление.
+        - form_class (Form): Форма, которую будет использовать представление.
+        - success_url (str): URL-адрес для перенаправления после успешного обновления продукта.
 
     Методы:
-    get_context_data(**kwargs) (dict): Переопределенный метод для добавления дополнительного контекста (набор форм
-                                       версий продукта).
-    form_valid(form) (HttpResponse): Переопределенный метод для обработки валидной формы и сохранения объекта
-                                     и его версий. Проверяет, чтобы была только одна активная версия продукта.
+        - get_context_data(**kwargs): Возвращает контекст данных для шаблона, включая набор форм для связанных версий
+                                      продукта.
+        Аргументы:
+            - kwargs: Дополнительные ключевые аргументы.
+
+        - form_valid(form): Сохраняет форму и связанные наборы форм, а также проверяет наличие более одной активной
+                            версии продукта.
+        Аргументы:
+            - form: Форма продукта.
+        Возвращает:
+            - HttpResponse: Ответ с перенаправлением при успешном обновлении или ответ с ошибками при неудаче.
+
+        - get_form_kwargs(): Возвращает аргументы, которые будут переданы в форму при ее создании, включая
+                             ID пользователя.
+        Возвращает:
+            - dict: Аргументы для создания формы.
     """
 
     model = Product
@@ -191,6 +207,16 @@ class ProductUpdateView(CustomLoginRequiredMixin, UpdateView):
     success_url = reverse_lazy('catalog:home')
 
     def get_context_data(self, **kwargs):
+        """
+        Получает контекст данных для шаблона.
+
+        Аргументы:
+            - kwargs: Дополнительные ключевые аргументы.
+
+        Возвращает:
+            - dict: Контекст данных для шаблона.
+        """
+
         context = super().get_context_data(**kwargs)
 
         SubjectFormset = inlineformset_factory(Product, ProductVersion, form=VersionForm, extra=1)
@@ -203,6 +229,16 @@ class ProductUpdateView(CustomLoginRequiredMixin, UpdateView):
         return context
 
     def form_valid(self, form):
+        """
+        Проверяет валидность формы и набора форм, сохраняет их и проверяет количество активных версий продукта.
+
+        Аргументы:
+            - form: Форма продукта.
+
+        Возвращает:
+            - HttpResponse: Ответ с перенаправлением при успешном обновлении или ответ с ошибками при неудаче.
+        """
+
         formset = self.get_context_data()['formset']
         self.object = form.save()
 
@@ -218,6 +254,20 @@ class ProductUpdateView(CustomLoginRequiredMixin, UpdateView):
             return self.form_invalid(form)
 
         return super().form_valid(form)
+
+    def get_form_kwargs(self):
+        """
+        Получает аргументы, которые будут переданы в форму при ее создании.
+
+        Возвращает:
+            - dict: Аргументы для создания формы.
+        """
+
+        kwargs = super().get_form_kwargs()
+
+        kwargs['user_id'] = self.request.user
+
+        return kwargs
 
 
 class ProductDeleteView(CustomLoginRequiredMixin, DeleteView):
@@ -260,7 +310,7 @@ class BlogListView(CustomLoginRequiredMixin, ListView):
         return Blog.objects.filter(is_published=True)
 
 
-class BlogCreateView(CustomLoginRequiredMixin, CreateView):
+class BlogCreateView(CustomLoginRequiredMixin, PermissionRequiredMixin, CreateView):
     """
     Класс-представление для создания нового блога.
 
@@ -278,6 +328,7 @@ class BlogCreateView(CustomLoginRequiredMixin, CreateView):
     model = Blog
     fields = ('title', 'content', 'preview', 'is_published')
     success_url = reverse_lazy('catalog:blog')
+    permission_required = 'catalog.add_blog'
 
 
 class BlogDetailView(CustomLoginRequiredMixin, DetailView):
@@ -310,7 +361,7 @@ class BlogDetailView(CustomLoginRequiredMixin, DetailView):
         return article
 
 
-class BlogUpdateView(CustomLoginRequiredMixin, UpdateView):
+class BlogUpdateView(CustomLoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     """
     Класс-представление для обновления существующей записи блога.
 
@@ -332,12 +383,13 @@ class BlogUpdateView(CustomLoginRequiredMixin, UpdateView):
     fields = ('title', 'content', 'preview', 'is_published')
     slug_field = 'slug'
     slug_url_kwarg = 'slug'
+    permission_required = 'catalog.change_blog'
 
     def get_success_url(self):
         return reverse_lazy('catalog:blog_detail', kwargs={'slug': self.object.slug})
 
 
-class BlogDeleteView(CustomLoginRequiredMixin, DeleteView):
+class BlogDeleteView(CustomLoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     """
     Класс-представление для удаления записи блога.
 
@@ -356,3 +408,4 @@ class BlogDeleteView(CustomLoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('catalog:blog')
     slug_field = 'slug'
     slug_url_kwarg = 'slug'
+    permission_required = 'catalog.delete_blog'

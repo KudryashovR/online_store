@@ -22,12 +22,16 @@
                 </p>
             </div>
             <div class="card-footer">
-                <a class="p-2 btn btn-outline-primary"
+                <a class="p-2 btn btn-outline-secondary"
                    href="{% url 'catalog:blog' %}">Вернуться к списку статей</a>
+                {% if perm.catalog.change_blog %}
                 <a class="p-2 btn btn-outline-primary"
                    href="{% url 'catalog:blog_edit' blog.slug %}">Редактировать статью</a>
+                {% endif %}
+                {% if perm.catalog.delete_blog %}
                 <a class="p-2 btn btn-outline-danger"
                    href="{% url 'catalog:blog_delete' blog.slug %}">Удалить статью</a>
+                {% endif %}
             </div>
         </div>
     </div>

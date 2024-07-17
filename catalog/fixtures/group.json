@@ -1,0 +1,27 @@
+[
+  {
+    "model": "auth.group",
+    "pk": 1,
+    "fields": {
+      "name": "Модератор",
+      "permissions": [
+        "can_cancel_publication",
+        "can_change_description",
+        "can_change_category"
+      ]
+    }
+  },
+  {
+    "model": "auth.group",
+    "pk": 2,
+    "fields": {
+      "name": "Контент-менеджер",
+      "permissions": [
+        "add_blog",
+        "change_blog",
+        "delete_blog",
+        "view_blog"
+      ]
+    }
+  }
+]
