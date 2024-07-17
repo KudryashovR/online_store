@@ -11,26 +11,27 @@ User = get_user_model()
 
 class Product(models.Model):
     """
-    Модель, представляющая продукт в системе.
+    Модель для хранения информации о продукте.
 
-    Атрибуты:
-        - name (CharField): Наименование продукта. Длина не должна превышать 100 символов.
+    Атрибуты модели:
+        - name (CharField): Наименование продукта.
         - description (TextField): Описание продукта. Может быть пустым или null.
-        - preview (ImageField): Изображение продукта. Загружается в директорию 'products/'. Может быть пустым или null.
-        - category (ForeignKey): Категория, к которой принадлежит продукт. Связь "многие ко одному" с моделью
-                                 `Category`.
-        - price (DecimalField): Цена продукта. Максимум 10 цифр с 2 десятичными знаками.
-        - created_at (DateTimeField): Дата и время создания продукта. Устанавливается автоматически при создании.
-        - updated_at (DateTimeField): Дата и время последнего обновления продукта. Устанавливается автоматически
-                                      при каждом обновлении.
-        - owner (ForeignKey): Владелец продукта, пользователь системы. Связь "многие к одному" с моделью `User`.
+        - preview (ImageField): Изображение продукта. Может быть пустым или null.
+        - category (ForeignKey): Категория, к которой относится продукт. Связь с моделью Category.
+        - price (DecimalField): Цена продукта в формате десятичного числа с двумя знаками после запятой.
+        - created_at (DateTimeField): Дата и время создания записи. Автоматически устанавливается при создании.
+        - updated_at (DateTimeField): Дата и время последнего обновления записи. Автоматически обновляется при каждом
+                                      сохранении.
+        - owner (ForeignKey): Владелец продукта. Связь с моделью User.
+        - is_published (BooleanField): Флаг, указывающий, опубликован ли продукт. По умолчанию False.
 
     Методы:
-        - __str__(): Возвращает строковое представление продукта, которое является его наименованием.
+        - __str__(): Возвращает строковое представление продукта (его наименование).
 
-    Класс Meta:
-        - verbose_name: Человекочитаемое имя модели в единственном числе ('Продукт').
-        - verbose_name_plural: Человекочитаемое имя модели во множественном числе ('Продукты').
+    Метаданные:
+        - verbose_name: Единичное название модели в интерфейсе администратора.
+        = verbose_name_plural: Множественное название модели в интерфейсе администратора.
+        - permissions: Дополнительные права доступа для модели.
     """
 
     name = models.CharField(max_length=100, verbose_name='Наименование', help_text='Введите наименование продукта')
@@ -43,13 +44,24 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products')
+    is_published = models.BooleanField(default=False, verbose_name='Опубликовано')
 
     def __str__(self):
+        """
+        Возвращает наименование продукта в виде строки.
+        """
+
         return self.name
 
     class Meta:
         verbose_name = 'Продукт'
         verbose_name_plural = 'Продукты'
+
+        permissions = [
+            ('can_cancel_publication', 'Can cancel publication of product'),
+            ('can_change_description', 'Can change description of product'),
+            ('can_change_category', 'Can change category of product'),
+        ]
 
 
 class Category(models.Model):
