@@ -8,40 +8,50 @@ from django.views.generic import ListView, TemplateView, DetailView, CreateView,
 from catalog.forms import ProductForm, VersionForm
 from catalog.mixins import CustomLoginRequiredMixin
 from catalog.models import Product, Contact, Blog, ProductVersion
+from catalog.services import get_cached_products
 
 
 class ProductListView(ListView):
     """
-    Класс-представление для отображения списка продуктов.
-
-    Наследует:
-    CustomLoginRequiredMixin (миксин): Обеспечивает доступ к представлению только для авторизованных пользователей.
-    ListView (ListView): Базовое представление для отображения списка объектов.
+    Представление на основе классов для вывода списка продуктов с пагинацией.
 
     Атрибуты класса:
-    model (Model): Модель, для которой создается представление списка (Product).
-    paginate_by (int): Количество объектов на одной странице (по умолчанию 10).
+    - model: Указывает, какая модель будет использоваться для представления данных (Product).
+    - paginate_by: Определяет количество объектов на одной странице (по умолчанию 10).
+    - template_name: Имя шаблона, который будет использоваться для отображения списка продуктов
+                     ('catalog/product_list.html').
 
     Методы:
-    get_context_data(**kwargs) (dict): Переопределенный метод для добавления дополнительного контекста (список продуктов
-                                       с их текущими версиями).
+    - get_context_data(self, **kwargs):
+        Переопределяет метод для добавления к контексту данных о продуктах и их текущих версиях.
+        Возвращает:
+            context (dict): Контекст с добавленными продуктами и их текущими версиями.
+
+    - get_queryset(self):
+        Переопределяет метод для получения кэшированных продуктов.
+        Возвращает:
+            queryset (QuerySet): Кэшированный QuerySet продуктов.
     """
 
     model = Product
     paginate_by = 10
+    template_name = 'catalog/product_list.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         products_with_versions = []
 
-        for product in Product.objects.all():
+        for product in get_cached_products():
             current_version = product.versions.filter(is_current=True).first()
             products_with_versions.append((product, current_version))
 
         context['products_with_versions'] = products_with_versions
 
         return context
+
+    def get_queryset(self):
+        return get_cached_products()
 
 
 class ContactView(CustomLoginRequiredMixin, TemplateView):

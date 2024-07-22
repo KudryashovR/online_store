@@ -57,6 +57,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.cache.UpdateCacheMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
+    'catalog.middleware.ExcludeCacheMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -167,6 +170,16 @@ LOGOUT_REDIRECT_URL = '/'
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379'
+        'LOCATION': env('CACHES_LOCATION')
     }
 }
+
+CACHE_MIDDLEWARE_ALIAS = 'default'
+CACHE_MIDDLEWARE_SECONDS = 60
+CACHE_MIDDLEWARE_KEY_PREFIX = ''
+
+CACHE_MIDDLEWARE_IGNORE_LIST = [
+    '/admin/',
+    '/login/',
+    '/logout/',
+]
