@@ -59,6 +59,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.cache.FetchFromCacheMiddleware',
+    'catalog.middleware.ExcludeCacheMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -172,3 +173,13 @@ CACHES = {
         'LOCATION': env('CACHES_LOCATION')
     }
 }
+
+CACHE_MIDDLEWARE_ALIAS = 'default'
+CACHE_MIDDLEWARE_SECONDS = 60
+CACHE_MIDDLEWARE_KEY_PREFIX = ''
+
+CACHE_MIDDLEWARE_IGNORE_LIST = [
+    '/admin/',
+    '/login/',
+    '/logout/',
+]
