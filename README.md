@@ -18,7 +18,7 @@
 
 ## Установка
 
-1. Убедитесь, что у Вас установлены postgresql, [Poetry](https://python-poetry.org/docs/#installation) и Python 3.7 или
+1. Убедитесь, что у Вас установлены postgresql, [Poetry](https://python-poetry.org/docs/#installation), Redis и Python 3.7 или
    выше.
 2. Клонируйте репозиторий и перейдите в корневую директорию проекта:
 
